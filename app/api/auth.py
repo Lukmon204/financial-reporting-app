@@ -57,7 +57,7 @@ async def register(user_data: schemas.RegisterRequest, db: Session = Depends(get
     # Создаем токены
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username": user.id, "role": user.role},
+        data={"sub": user.username, "user_id": user.id, "role": user.role},
         expires_delta=access_token_expires
     )
     refresh_token = create_refresh_token(
@@ -67,7 +67,7 @@ async def register(user_data: schemas.RegisterRequest, db: Session = Depends(get
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 @router.post("/login", response_model=schemas.Token)
-async def login(request: Request, form_ OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """Вход пользователя в систему"""
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -103,10 +103,12 @@ async def login(request: Request, form_ OAuth2PasswordRequestForm = Depends(), d
         data={"sub": user.username, "user_id": user.id, "role": user.role}
     )
     
-    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer("/refresh")
+    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+
+@router.post("/refresh")
 async def refresh_token(refresh_token: str, db: Session = Depends(get_db)):
     """Обновление токена доступа"""
-    token_data = verify_token(refresh_token)
+    token_data = utils.security.verify_token(refresh_token)
     if token_data is None or token_data.get("token_type") != "refresh":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -132,8 +134,8 @@ async def refresh_token(refresh_token: str, db: Session = Depends(get_db)):
 @router.post("/logout")
 async def logout(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """Выход из системы"""
-    token_data = verify_token(token)
-    if token_
+    token_data = utils.security.verify_token(token)
+    if token_data:
         # Логируем выход
         audit_log = models.AuditLog(
             user_id=token_data["user_id"],
@@ -147,7 +149,7 @@ async def logout(token: str = Depends(oauth2_scheme), db: Session = Depends(get_
 @router.get("/me", response_model=schemas.UserResponse)
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """Получение информации о текущем пользователе"""
-    token_data = verify_token(token)
+    token_data = utils.security.verify_token(token)
     if token_data is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

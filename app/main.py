@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
-from .api import auth, reports, users, admin
+from .api import auth, reports, users, admin, notifications
 from .config import ALLOWED_ORIGINS
 from .database import engine, Base
 from pytz import timezone
@@ -39,6 +39,7 @@ app.include_router(auth.router)
 app.include_router(reports.router)
 app.include_router(users.router)
 app.include_router(admin.router)
+app.include_router(notifications.router)
 
 @app.middleware("http")
 async def add_timezone_header(request: Request, call_next):
@@ -47,7 +48,7 @@ async def add_timezone_header(request: Request, call_next):
     response = await call_next(request)
     return response
 
-@app.getHTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     """Главная страница"""
     return templates.TemplateResponse("index.html", {"request": request})

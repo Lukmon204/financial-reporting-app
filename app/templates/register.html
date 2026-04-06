@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - Финансовая отчетность</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#000000">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Регистрация</h1>
+            <nav>
+                <a href="/">Главная</a>
+                <a href="/login">Вход</a>
+            </nav>
+        </header>
+
+        <main>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="username">Имя пользователя</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="full_name">Полное имя</label>
+                    <input type="text" id="full_name" name="full_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password_confirm">Подтверждение пароля</label>
+                    <input type="password" id="password_confirm" name="password_confirm" required>
+                </div>
+
+                <button type="submit">Зарегистрироваться</button>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // Проверка совпадения паролей
+            if (formData.get('password') !== formData.get('password_confirm')) {
+                alert('Пароли не совпадают');
+                return;
+            }
+            
+            const registerData = {
+                username: formData.get('username'),
+                email: formData.get('email'),
+                full_name: formData.get('full_name'),
+                password: formData.get('password')
+            };
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(registerData)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('Регистрация успешна! Ваш аккаунт ожидает одобрения администратора.');
+                    window.location.href = '/login';
+                } else {
+                    const errorData = await response.json();
+                    alert(`Ошибка: ${errorData.detail || 'Не удалось зарегистрироваться'}`);
+                }
+            } catch (error) {
+                console.error('Ошибка при регистрации:', error);
+                alert('Произошла ошибка при регистрации');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма отчета - Финансовая отчетность</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#000000">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Форма финансового отчета</h1>
+            <nav>
+                <a href="/">Главная</a>
+                <a href="/dashboard">Дашборд</a>
+                <button id="logout-btn">Выйти</button>
+            </nav>
+        </header>
+
+        <main>
+            <form id="report-form">
+                <div class="form-group">
+                    <label for="cash_sales">💵 Наличка (cash_sales)</label>
+                    <input type="number" id="cash_sales" name="cash_sales" step="0.01" inputmode="decimal" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="realization">📦 Реализация (realization)</label>
+                    <input type="number" id="realization" name="realization" step="0.01" inputmode="decimal" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="incoming">📥 Поступления (incoming)</label>
+                    <input type="number" id="incoming" name="incoming" step="0.01" inputmode="decimal" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="purchases">🛒 Закупки (purchases)</label>
+                    <input type="number" id="purchases" name="purchases" step="0.01" inputmode="decimal" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="income">💰 Приход (income)</label>
+                    <input type="number" id="income" name="income" step="0.01" inputmode="decimal" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment">💳 Оплата поставщикам (payment)</label>
+                    <input type="number" id="payment" name="payment" step="0.01" inputmode="decimal" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="expenses">💸 Расход (expenses)</label>
+                    <input type="number" id="expenses" name="expenses" step="0.01" inputmode="decimal" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="balance">📊 Остаток (balance)</label>
+                    <input type="number" id="balance" name="balance" step="0.01" inputmode="decimal" required>
+                </div>
+
+                <button type="submit">Отправить отчет</button>
+            </form>
+
+            <!-- Предварительный просмотр -->
+            <div id="preview" class="preview hidden">
+                <h2>Предварительный просмотр отчета</h2>
+                <div id="preview-content"></div>
+                <button id="confirm-send">Подтвердить и отправить</button>
+                <button id="cancel-preview">Отменить</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

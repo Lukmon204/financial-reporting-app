@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - Финансовая отчетность</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#000000">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Вход в систему</h1>
+            <nav>
+                <a href="/">Главная</a>
+                <a href="/register">Регистрация</a>
+            </nav>
+        </header>
+
+        <main>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Имя пользователя</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="remember_me"> Запомнить меня
+                    </label>
+                </div>
+
+                <button type="submit">Войти</button>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const loginData = {
+                username: formData.get('username'),
+                password: formData.get('password'),
+                remember_me: formData.get('remember_me') === 'on'
+            };
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(loginData)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('refresh_token', data.refresh_token);
+                    
+                    // Перенаправление на дашборд
+                    window.location.href = '/dashboard';
+                } else {
+                    const errorData = await response.json();
+                    alert(`Ошибка: ${errorData.detail || 'Неверные учетные данные'}`);
+                }
+            } catch (error) {
+                console.error('Ошибка при входе:', error);
+                alert('Произошла ошибка при входе в систему');
+            }
+        });
+    </script>
+</body>
+</html>
